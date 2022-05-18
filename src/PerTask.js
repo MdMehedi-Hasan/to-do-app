@@ -1,13 +1,16 @@
 import React from 'react';
 
-const PerTask = () => {
+const PerTask = ({ task, func,complete }) => {
+    const {taskTitle,description,_id} =task
     return (
-        <div class="card w-50 bg-base-100 shadow-xl">
-            <div class="card-body">
-                <h2 class="card-title">Task name</h2>
-                <p>If a dog chews shoes whose shoes does he choose?</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Delete Task</button>
+        <div className="card w-50 bg-base-100 shadow-xl">
+            <div className="card-body ">
+                <h2 className="card-title justify-center">{taskTitle}</h2>
+                <p>{description}</p>
+                <div className="card-actions justify-center">
+                    <button onClick={() => func(_id)} className="btn btn-primary">Delete Task</button>
+                    <button onClick={()=>complete(task)} className="btn btn-primary">Task Completed</button>
+                    
                 </div>
             </div>
         </div>

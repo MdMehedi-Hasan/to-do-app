@@ -1,10 +1,18 @@
+import { useEffect, useState } from 'react';
+import Notify from './Notify';
 import './App.css';
 import Login from './Login';
 import PerTask from './PerTask';
 
 function App() {
-  // dev
-  // vGbRLmLifGeMrwT8
+  const [tasks, setTasks] = useState([])
+  const [render, setRender] = useState(false);
+  const [remove, setRemove] = useState(false);
+  useEffect(() => {
+    fetch('http://localhost:5000/tasks')
+      .then(res => res.json())
+      .then(data => setTasks(data))
+  }, [render, remove])
   const handleSubmit = (e) => {
     e.preventDefault();
     const taskName = e.target.title.value;
@@ -17,10 +25,30 @@ function App() {
       },
       body: JSON.stringify(data),
     })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+        setRender(!render)
+      })
+  }
+  const handleDelete = (id) => {
+    fetch(`http://localhost:5000/tasks/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({}),
     })
+      .then(response => response.json())
+      .then(data => {
+        setRemove(!remove)
+        console.log('Success:', data);
+      })
+    console.log('deleted', id)
+  }
+  const taskComplete = (data) => {
+    console.log(data)
+    alert(`${data.taskTitle} Task Completed!`)
   }
   return (
     <div className="App">
@@ -34,13 +62,13 @@ function App() {
                   <label className="label">
                     <span className="label-text font-bold">Task name</span>
                   </label>
-                  <input name='title' type="text" placeholder="Task title" className="input input-bordered" />
+                  <input required name='title' type="text" placeholder="Task title" className="input input-bordered" />
                 </div>
                 <div className="form-control">
                   <label className="label">
                     <span className="label-text font-bold">Description</span>
                   </label>
-                  <textarea name="description" id="" cols="30" rows="10" className="input input-bordered"></textarea>
+                  <textarea required name="description" id="" cols="30" rows="10" className="input input-bordered"></textarea>
                 </div>
                 <div className="form-control mt-6">
                   <button className="btn btn-primary">Add task</button>
@@ -50,8 +78,10 @@ function App() {
           </div>
         </div>
       </div>
-      <div className='grid grid-cols-4 gap-5'>
-        <PerTask></PerTask>
+      <div className='grid lg:grid-cols-4 grid-cols-2 gap-5'>
+        {
+          tasks.map(task => <PerTask key={task._id} task={task} func={() => handleDelete(task._id)} complete={() => taskComplete(task)}></PerTask>)
+        }
       </div>
       {/* <Login></Login> */}
     </div>
